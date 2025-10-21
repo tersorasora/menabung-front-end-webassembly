@@ -201,8 +201,6 @@ C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\dotnet.runtime.js.map
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_no_CJK.lfu7j35m59.dat
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.p3w9k1xyfj.wasm
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.zyx9awnquk.pdb
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\blazor.boot.json
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\blazor.webassembly.js.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\Microsoft.AspNetCore.Authorization.50odlujk1g.wasm.gz
@@ -407,8 +405,6 @@ C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\dotnet.runtime.js.map
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\icudt_no_CJK.lfu7j35m59.dat.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.p3w9k1xyfj.wasm.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.zyx9awnquk.pdb.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\blazor.boot.json.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\BlazorAppWeb.staticwebassets.runtime.json
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\BlazorAppWeb.staticwebassets.endpoints.json
@@ -1081,9 +1077,6 @@ C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\si7lyzm4cd-zbl9qys38n.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\w4mkmpt3id-tjcz0u77k5.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\rceehk0bbk-tptq2av103.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\htrivhqp2a-lfu7j35m59.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-p3w9k1xyfj.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-zyx9awnquk.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-ebf1byvqak.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\staticwebassets.build.json
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\staticwebassets.build.json.cache
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\staticwebassets.development.json
@@ -1093,3 +1086,11 @@ C:\Jobs\BlazorAppWeb\obj\Release\net9.0\BlazorAppWeb.dll
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\refint\BlazorAppWeb.dll
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\BlazorAppWeb.pdb
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\ref\BlazorAppWeb.dll
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.im7wvm66go.wasm
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.xlt8cbp5d3.pdb
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.im7wvm66go.wasm.gz
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.xlt8cbp5d3.pdb.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\BlazorAppWeb.sourcelink.json
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-im7wvm66go.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-xlt8cbp5d3.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-a6whgf9nhc.gz

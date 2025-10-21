@@ -1,0 +1,1 @@
+C:\Jobs\BlazorAppWeb\publish\web.config
