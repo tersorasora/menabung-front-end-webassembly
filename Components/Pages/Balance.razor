@@ -1,0 +1,288 @@
+@page "/balance"
+@inject NavigationManager NavManager
+@using System.Net.Http
+@using BlazorAppWeb.Components.Models
+@using BlazorAppWeb.Components.Layout
+@using System.Text.Json
+@using Microsoft.VisualBasic
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<PageTitle>Balance</PageTitle>
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-3 mb-4">
+        <h3 class="card-title mb-2 fw-bolder">Your Balance</h3>
+        <h4 class="text-success fw-bold">@currentBalance.ToString("C", new System.Globalization.CultureInfo("id-ID"))</h4>
+    </div>
+
+    <div class="filter d-flex flex-row">
+        <div class="month-group">
+            <span>Month Filter</span>
+            <select @bind="monthValueFilter">
+                <option value="0" selected>All</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </div>
+
+        <div class="year-group">
+            <span>Year Filter</span>
+            <select @bind="yearValueFilter">
+                @for (int year = DateTime.Now.Year; year >= (DateTime.Now.Year - 10); year--)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+
+        <div class="order-group">
+            <span>Order By</span>
+            <button @onclick="ToggleOrder">@orderingBy</button>
+        </div>
+
+        @* Create a monthly recaps *@
+        <div class="recap-group ms-auto">
+            <button @onclick="createRecap" disabled="@(selectedMonth == 0 || transactions.Count == 0)">Monthly Recap (Coming Soon)</button>
+        </div>
+    </div>
+
+    <h5 class="mb-2 mt-3 fw-bold">Transactions History</h5>
+
+    @if (transactions.Count == 0)
+    {
+        <p class="text-muted">No transactions yet.</p>
+    }
+    else
+    {
+        @foreach (var t in transactions)
+        {
+            <div class="card mb-3 shadow-sm border-0" style="border-left: 5px solid @(t.Type == "deposit" ? "#28a745" : "#dc3545");">
+                <div class="card-body border @(t.Type == "deposit" ? "border-success" : "border-danger") border-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-1">@t.Description</h6>
+                            <small class="text-muted">@t.Date.ToString("dd-MM-yyyy")</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge @(t.Type == "deposit" ? "bg-success" : "bg-danger")">@t.Type</span><br />
+                            <span class="fw-bold">
+                                @(t.Type == "Deposit" ? "+" : "-")
+                                @t.Nominal.ToString("C", new System.Globalization.CultureInfo("id-ID"))
+                            </span>
+                            <span>
+                                <button class="btn btn-light btn-sm icon-btn text-danger border-0"
+                                    title="Delete Transaction"
+                                    @onclick="() => DeleteTransaction(t.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>                            
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private decimal currentBalance = 0;
+    private List<Transactions> transactions = new List<Transactions>();
+    private List<Transactions> allTransactions = new List<Transactions>();
+    private int selectedMonth = 0;
+    private string userID = string.Empty;
+    private int monthValueFilter{
+        get => selectedMonth;
+        set{
+            selectedMonth = value;
+            ApplyDateFilter();
+        }
+    }
+    private int selectedYear { get; set; } = DateTime.Now.Year;
+    private int yearValueFilter{
+        get => selectedYear;
+        set{
+            selectedYear = value;
+            ApplyDateFilter();
+        }
+    }
+
+    private string orderingBy = "Date";
+    private void ToggleOrder(){
+        switch(orderingBy){
+            case "Date":
+                orderingBy = "Nominal";
+                break;
+            case "Nominal":
+                orderingBy = "Type";
+                break;
+            case "Type":
+                orderingBy = "Date";
+                break;
+            default:
+                orderingBy = "Date";
+                break;
+        }
+        ToggleView();
+    }
+
+    private void ToggleView(){
+        if(orderingBy == "Date"){
+            ToggleOrderByDate();
+        }else if(orderingBy == "Nominal"){
+            ToggleOrderByNominal();
+        }else if(orderingBy == "Type"){
+            ToggleOrderByType();
+        }
+    }
+
+    private void ToggleOrderByDate(){
+        transactions = transactions.OrderBy(t => t.Date).ToList();
+    }
+
+    private void ToggleOrderByNominal(){
+        transactions = transactions.OrderBy(t => t.Nominal).ToList();
+    }
+
+    private void ToggleOrderByType(){
+        transactions = transactions.OrderBy(t => t.Type).ToList();
+    }
+
+    private void createRecap(){
+        try{
+            Console.WriteLine($"Creating recap for {selectedMonth}-{selectedYear} with {transactions.Count} transactions.");
+            RecapTransactions recap = new RecapTransactions();
+            recap.Period = new DateTime(selectedYear, selectedMonth, 1).ToString("MMMM yyyy");
+            recap.TotalIncome = transactions.Where(t => t.Type.ToLower() == "deposit").Sum(t => t.Nominal);
+            recap.TotalExpense = transactions.Where(t => t.Type.ToLower() == "withdraw").Sum(t => t.Nominal);
+            recap.RemainderBalance = recap.TotalIncome - recap.TotalExpense;
+
+            // Serialize recap data to JSON for navigation
+            var recapJson = System.Text.Json.JsonSerializer.Serialize(recap);
+            var encoded = Uri.EscapeDataString(recapJson);
+
+            // Navigate to recap page with query parameter
+            NavManager.NavigateTo($"/recap?data={encoded}");
+        }catch(Exception ex){
+            Console.WriteLine($"Error creating recap: {ex.Message}");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
+
+        if(string.IsNullOrEmpty(token)){
+            Console.WriteLine("No Token Found");
+            currentBalance = 0;
+            return;
+        }
+
+        // Decode payload from JWT to get userID
+        var parts = token.Split('.');
+        var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
+        var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
+        userID = payload.RootElement.GetProperty("sub").ToString();
+
+        try{
+            await FetchBalance(userID);
+            await FetchTransactions(userID);
+            ToggleView();
+        }catch(Exception ex){
+            Console.WriteLine($"Error during initialization: {ex.Message}");
+        }
+    }
+
+    private async Task FetchBalance(string? userID)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"user/balance/{userID}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            currentBalance = json.GetProperty("balance").GetDecimal();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching balance: {ex.Message}");
+        }
+    }
+
+    private async Task FetchTransactions(string? userID){
+        try{
+            var response = await Http.GetAsync($"transaction/byid/{userID}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            
+            if(json.TryGetProperty("transaction", out var transactionsJson)){
+                allTransactions = transactionsJson.EnumerateArray().Select(t => new Transactions {
+                    Id = t.TryGetProperty("transaction_id", out var idProp) ? idProp.GetInt32() : 0,
+                    Description = t.GetProperty("description").GetString() ?? string.Empty,
+                    Type = t.GetProperty("transaction_type").GetString() ?? string.Empty,
+                    Nominal = t.GetProperty("transaction_nominal").GetDecimal(),
+                    Date = t.GetProperty("transaction_date").GetDateTime()
+                }).ToList();
+
+                // Initialize transactions with all by default
+                transactions = new List<Transactions>(allTransactions);
+            }
+        }catch(Exception ex){
+            Console.WriteLine($"Error fetching transactions: {ex.Message}");
+        }
+    }
+
+    private void ApplyDateFilter(){
+        if(selectedMonth == 0 ){
+            transactions = allTransactions.Where(t => t.Date.Year == selectedYear).ToList();
+        }else{
+            transactions = allTransactions.Where(t => t.Date.Month == selectedMonth && t.Date.Year == selectedYear).ToList();
+        }
+    }
+
+    private static byte[] ParseBase64WithoutPadding(string base64)
+    {
+        base64 = base64.Replace('-', '+').Replace('_', '/');
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Convert.FromBase64String(base64);
+    }
+
+    private async Task DeleteTransaction(int id)
+    {
+        Console.WriteLine($"Deleting transaction with ID {id}");
+        var response = await Http.DeleteAsync($"transaction/delete/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Transaction deleted successfully.");
+            // Optionally refresh list here
+            NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+        }
+        else
+        {
+            Console.WriteLine($"Failed to delete transaction. Status: {response.StatusCode}");
+        }
+    }
+
+    private class Transactions {
+        public int Id { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty; 
+        public decimal Nominal { get; set; } = 0;
+        public DateTime Date { get; set; } = DateTime.Now;
+    }
+}

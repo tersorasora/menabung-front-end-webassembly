@@ -1,0 +1,73 @@
+﻿@page "/"
+@using Microsoft.VisualBasic
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-4 d-flex flex-column align-items-center">
+    <h1>Hello Again, </h1>
+    <h1 class="fw-bold mb-4">@nickname!</h1>
+    <h4>Welcome to Menabung</h4>
+</div>
+
+@code {
+    private string nickname = "Guest";
+    @* check if user hasn't login, then navigated to login page *@
+    protected override async Task OnInitializedAsync()
+    {   
+        try{
+            await FetchNickname();
+        }
+        catch(Exception ex){
+            Console.WriteLine($"Error during initialization: {ex.Message}");
+        }
+    }
+
+    private async Task FetchNickname(){
+        try{
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
+            if(string.IsNullOrEmpty(token)){
+                nickname = "Guest";
+                return;
+            }
+
+            var parts = token.Split('.');
+            if (parts.Length != 3)
+            {
+                nickname = "Guest";
+                return;
+            }
+            
+            // Decode the payload part (base64)
+            var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
+            var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
+
+            if (payload.RootElement.TryGetProperty("nickname", out var nickElement))
+            {
+                nickname = nickElement.GetString() ?? "Guest";
+            }
+            else
+            {
+                nickname = "Guest";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching nickname: {ex.Message}");
+            nickname = "Guest";
+        }
+    }
+
+    private static byte[] ParseBase64WithoutPadding(string base64)
+    {
+        base64 = base64.Replace('-', '+').Replace('_', '/');
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Convert.FromBase64String(base64);
+    }
+}

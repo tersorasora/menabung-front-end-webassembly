@@ -1,0 +1,39 @@
+@page "/recap"
+@inject NavigationManager NavManager
+@using BlazorAppWeb.Components.Models
+@using System.Net.Http
+@using BlazorAppWeb.Components.Layout
+@using System.Text.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Recap of @RecapData.Period</PageTitle>
+
+<div class="recap-container mt-4">
+    <div class="card shadow-sm p-3 mb-4">
+        <h3 class="card-title mb-2 fw-bolder">Recap for @RecapData.Period</h3>
+        <h4 class="text-success fw-bold">Total Income: @RecapData.TotalIncome.ToString("C", new System.Globalization.CultureInfo("id-ID"))</h4>
+        <h4 class="text-danger fw-bold">Total Expense: @RecapData.TotalExpense.ToString("C", new System.Globalization.CultureInfo("id-ID"))</h4>
+        <h4 class="fw-bold">Remainder Balance: @RecapData.RemainderBalance.ToString("C", new System.Globalization.CultureInfo("id-ID"))</h4>
+    </div>
+</div>
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "data")]
+    public string? RecapJson { get; set; }
+    public RecapTransactions RecapData { get; set; } = new RecapTransactions();
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(RecapJson))
+        {
+            var json = Uri.UnescapeDataString(RecapJson);
+            RecapData = JsonSerializer.Deserialize<RecapTransactions>(json) ?? new RecapTransactions();
+        }
+    }
+
+    private async Task DownloadAsPdf()
+    {
+        await JS.InvokeVoidAsync("window.print"); // Quick save-as-PDF method
+    }
+}

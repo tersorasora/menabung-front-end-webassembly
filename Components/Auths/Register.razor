@@ -1,0 +1,81 @@
+@page "/register"
+@layout NoLayout
+@using System.Net.Http
+@using BlazorAppWeb.Components.Layout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h2>Hi There</h2>
+        <p class="subtitle">Please sign up your account!</p>
+
+        <EditForm Model="@registerModel" OnValidSubmit="HandleRegister" class="form-register">
+            <div class="input-group">
+                <input @bind-value="registerModel.Username" type="text" placeholder="Username" class="input-field" />
+            </div>
+
+            <div class="input-group">
+                <input @bind-value="registerModel.Nickname" type="text" placeholder="Nickname" class="input-field" />
+            </div>
+
+            <div class="input-group">
+                <input @bind-value="registerModel.Password" type="password" placeholder="Password" class="input-field" />
+            </div>
+
+            <button type="submit" class="btn-register">Sign Up</button>
+        </EditForm>
+
+        <a href="/login">Already have an account?</a>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <p class="message">@message</p>
+        }
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+    private string message = string.Empty;
+
+    private async Task HandleRegister()
+    {
+        Console.WriteLine($"Attempting registration: {registerModel.Username} / {registerModel.Nickname} / {registerModel.Password}");
+
+        var response = await Http.PostAsJsonAsync("user/register", new 
+        { 
+            username = registerModel.Username, 
+            nickname = registerModel.Nickname,
+            password = registerModel.Password
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<RegisterResult>();
+            message = $"Registration successful! Message: {result?.Message}";
+
+            @* Move to login page *@
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            message = $"Registration failed ({response.StatusCode}): {error}";
+        }
+    }
+
+    private class RegisterModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Nickname { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private class RegisterResult
+    {
+        public string Message { get; set; } = string.Empty;
+    }
+}

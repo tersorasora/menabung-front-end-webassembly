@@ -1,0 +1,25 @@
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckTokenAsync();
+    }
+
+    private async Task CheckTokenAsync()
+    {
+        try
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                Navigation.NavigateTo("/login", forceLoad: true);
+            }
+        }
+        catch
+        {
+            // JS not yet available — safe to ignore
+        }
+    }
+}

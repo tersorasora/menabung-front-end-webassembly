@@ -1,0 +1,113 @@
+@page "/transaction"
+@using System.Net.Http
+@using BlazorAppWeb.Components.Layout
+@using System.Text.Json
+@using Microsoft.VisualBasic
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<PageTitle>Transaction</PageTitle>
+
+<div class="container mt-4 d-flex flex-column align-items-center">
+    <h3>Transaction</h3>
+    <div class="card shadow-sm mt-4 mb-4 w-100 p-3">
+        <p class="card-text h5 fw-bold">Insert your Transaction</p>
+        <EditForm Model="@transactionModel" OnValidSubmit="HandleInputTransaction" class="form-transaction">
+            <div class="input-group mb-3" >
+                <input @bind-value="transactionModel.description" type="text" placeholder="Description" class="input-field" style="width: 100%; padding: 5px;" />
+            </div>
+
+            <div class="input-group mb-3">
+                <select @bind="transactionModel.transaction_type" class="input-field">
+                    <option value="" disabled selected>Select Type</option>
+                    <option value="deposit">Deposit</option>
+                    <option value="withdraw">Withdraw</option>
+                </select>
+            </div>
+
+            <div class="input-group mb-3">
+                <input @bind-value="transactionModel.transaction_nominal" type="number" placeholder="Nominal" class="input-field" />
+            </div>
+
+            <div class="input-group mb-3">
+                <input @bind-value="transactionModel.transaction_date" type="date" class="input-field" />
+            </div>
+
+            <button type="submit" class="btn-submit">Submit</button>
+
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private TransactionModel transactionModel = new();
+    private int userID = 0;
+    private string? token = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
+        if(string.IsNullOrEmpty(token)){
+            Console.WriteLine("No Token Found");
+            return;
+        }
+
+        var parts = token.Split('.');
+        var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
+        var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
+        userID = int.Parse(payload.RootElement.GetProperty("sub").ToString());
+    }
+
+    private async Task HandleInputTransaction()
+    {
+        try
+        {
+            transactionModel.user_id = userID;
+            Console.WriteLine($"Submitting transaction: {transactionModel.description}, {transactionModel.transaction_type}, {transactionModel.transaction_nominal}, {transactionModel.transaction_date}, UserID: {transactionModel.user_id}");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "transaction/add")
+            {
+                Content = JsonContent.Create(transactionModel)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Transactions submitted successfully.");
+                await JS.InvokeVoidAsync("alert", "Transaction submitted successfully.");
+                // Optionally, reset the form or provide user feedback here
+                transactionModel = new TransactionModel(); // Reset form
+            }
+            else
+            {
+                Console.WriteLine($"Failed to submit transaction. Status code: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error submitting transaction: {ex.Message}");
+            // Optionally, handle exception here
+        }
+    }
+
+    private static byte[] ParseBase64WithoutPadding(string base64)
+    {
+        base64 = base64.Replace('-', '+').Replace('_', '/');
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Convert.FromBase64String(base64);
+    }
+
+    private class TransactionModel
+    {
+        public string? description { get; set; } = string.Empty;
+        public string? transaction_type { get; set; } = string.Empty;
+        public decimal transaction_nominal { get; set; } = 0;
+        public DateTime transaction_date { get; set; } = DateTime.Now;
+        public int user_id { get; set; } = 0;
+    }
+}

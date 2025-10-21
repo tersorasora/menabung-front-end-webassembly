@@ -1,0 +1,76 @@
+.register-wrapper[b-e9nzvo7cpy] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-card[b-e9nzvo7cpy] {
+    background-color: #fff;
+    padding: 2.5rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+    animation: fadeIn-b-e9nzvo7cpy 0.5s ease-in-out;
+}
+
+.register-card h2[b-e9nzvo7cpy] {
+    font-size: 1.8rem;
+    margin-bottom: 0.2rem;
+    color: #333;
+}
+
+.subtitle[b-e9nzvo7cpy] {
+    color: #777;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.input-group[b-e9nzvo7cpy] {
+    margin-bottom: 1.2rem;
+}
+
+input.input-field[b-e9nzvo7cpy] {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input.input-field:focus[b-e9nzvo7cpy] {
+    border-color: #74ebd5;
+    box-shadow: 0 0 5px rgba(116, 235, 213, 0.7);
+}
+
+.btn-register[b-e9nzvo7cpy] {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-register:hover[b-e9nzvo7cpy] {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.message[b-e9nzvo7cpy] {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn-b-e9nzvo7cpy {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
