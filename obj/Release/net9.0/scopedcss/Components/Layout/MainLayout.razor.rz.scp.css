@@ -19,6 +19,7 @@ main[b-tkcazam59b] {
     height: 3.5rem;
     display: flex;
     align-items: center;
+    z-index: 99999;
 }
 
     .top-row[b-tkcazam59b]  a, .top-row[b-tkcazam59b]  .btn-link {

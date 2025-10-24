@@ -5,6 +5,7 @@
 @using Microsoft.VisualBasic
 @inject IJSRuntime JS
 @inject HttpClient Http
+@inject TokenService tokenService
 
 <PageTitle>Transaction</PageTitle>
 
@@ -41,28 +42,22 @@
 
 @code {
     private TransactionModel transactionModel = new();
-    private int userID = 0;
+    private string userID = string.Empty;
     private string? token = string.Empty;
     
     protected override async Task OnInitializedAsync()
     {
-        token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
-        if(string.IsNullOrEmpty(token)){
-            Console.WriteLine("No Token Found");
-            return;
-        }
-
-        var parts = token.Split('.');
-        var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
-        var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
-        userID = int.Parse(payload.RootElement.GetProperty("sub").ToString());
+        await tokenService.InitializeAsync();
+        token = tokenService.Token;
+        
+        userID = tokenService.UserId ?? string.Empty;
     }
 
     private async Task HandleInputTransaction()
     {
         try
         {
-            transactionModel.user_id = userID;
+            transactionModel.user_id = int.Parse(userID);
             Console.WriteLine($"Submitting transaction: {transactionModel.description}, {transactionModel.transaction_type}, {transactionModel.transaction_nominal}, {transactionModel.transaction_date}, UserID: {transactionModel.user_id}");
 
             var request = new HttpRequestMessage(HttpMethod.Post, "transaction/add")
@@ -89,17 +84,6 @@
             Console.WriteLine($"Error submitting transaction: {ex.Message}");
             // Optionally, handle exception here
         }
-    }
-
-    private static byte[] ParseBase64WithoutPadding(string base64)
-    {
-        base64 = base64.Replace('-', '+').Replace('_', '/');
-        switch (base64.Length % 4)
-        {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
-        }
-        return Convert.FromBase64String(base64);
     }
 
     private class TransactionModel

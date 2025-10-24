@@ -1,5 +1,8 @@
-﻿@inject IJSRuntime JS
+﻿@using System.Text.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject TokenService tokenService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -30,6 +33,21 @@
         </div>
 
         <div class="nav-item px-3">
+            <NavLink class="nav-link" href="profile">
+                <span class="bi bi-person-circle" aria-hidden="true"></span> Profile
+            </NavLink>
+        </div>
+
+        @if(isAdmin)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="admin">
+                    <span class="bi bi-incognito" aria-hidden="true"></span> Admin
+                </NavLink>
+            </div>
+        }
+
+        <div class="nav-item px-3">
             <button class="nav-link btn btn-link text-start" @onclick="Logout">
                 <span class="bi bi-box-arrow-left" aria-hidden="true"></span> Log Out
             </button>
@@ -38,6 +56,20 @@
 </div>
 
 @code {
+    private bool isAdmin = false;
+    private string userID = string.Empty;
+    protected override async Task OnInitializedAsync()
+    { 
+        while (string.IsNullOrEmpty(tokenService.UserId))
+        {
+            await Task.Delay(200);
+        }
+        userID = tokenService.UserId ?? string.Empty;
+
+        isAdmin = await checkIfAdmin();
+        Console.WriteLine($"User ID: {userID}, IsAdmin: {isAdmin}");
+    }
+
     private async Task Logout()
     {
         bool confirm = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to log out?");
@@ -45,6 +77,39 @@
         {
             await JS.InvokeVoidAsync("localStorage.removeItem", "token");
             Navigation.NavigateTo("/login", forceLoad: true);
+        }
+    }
+
+    private async Task<bool> checkIfAdmin()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"user/getRole/{userID}");
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                if (json.GetProperty("role_id").GetInt32() == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error response: {response.StatusCode}");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking admin role: {ex.Message}");
+            return false;
         }
     }
 }

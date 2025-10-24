@@ -1,8 +1,10 @@
 ﻿@page "/"
 @using Microsoft.VisualBasic
+@using System.Text.Json
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject HttpClient Http
+@inject TokenService tokenService
 
 <PageTitle>Home</PageTitle>
 
@@ -27,29 +29,17 @@
 
     private async Task FetchNickname(){
         try{
-            var token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
-            if(string.IsNullOrEmpty(token)){
-                nickname = "Guest";
-                return;
-            }
-
-            var parts = token.Split('.');
-            if (parts.Length != 3)
-            {
-                nickname = "Guest";
-                return;
-            }
+            await tokenService.InitializeAsync();
             
-            // Decode the payload part (base64)
-            var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
-            var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
-
-            if (payload.RootElement.TryGetProperty("nickname", out var nickElement))
-            {
-                nickname = nickElement.GetString() ?? "Guest";
+            if(!string.IsNullOrEmpty(tokenService.UserId)){
+                var userId = int.Parse(tokenService.UserId);
+                var response = await Http.GetAsync($"user/{userId}");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                nickname = json.GetProperty("nickname").GetString() ?? "Guest";
             }
-            else
-            {
+            else{
+                Console.WriteLine("User ID not found in token service.");
                 nickname = "Guest";
             }
         }
@@ -58,16 +48,5 @@
             Console.WriteLine($"Error fetching nickname: {ex.Message}");
             nickname = "Guest";
         }
-    }
-
-    private static byte[] ParseBase64WithoutPadding(string base64)
-    {
-        base64 = base64.Replace('-', '+').Replace('_', '/');
-        switch (base64.Length % 4)
-        {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
-        }
-        return Convert.FromBase64String(base64);
     }
 }

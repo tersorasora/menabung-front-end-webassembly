@@ -1,0 +1,300 @@
+@page "/profile"
+@using Microsoft.VisualBasic
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject TokenService tokenService
+@inject AuthService Auth
+
+<PageTitle>Profile Management</PageTitle>
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0 rounded-4" style="max-width: 450px; width: 100%;">
+        <div class="card-body p-4">
+            <h3 class="card-title text-center mb-4 fw-bold text-primary">
+                <i class="bi bi-person-circle me-2"></i>Profile
+            </h3>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-secondary">
+                    <i class="bi bi-envelope me-2"></i>Email
+                </label>
+                <div class="form-control bg-light">@currentUser.Email</div>
+            </div>
+
+            <!-- Nickname -->
+            <div class="mb-3 position-relative">
+                <label class="form-label fw-semibold text-secondary">
+                    <i class="bi bi-person-badge me-2"></i>Nickname
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="@currentUser.Nickname" readonly />
+                    <button class="btn btn-outline-secondary" @onclick="OpenEditModalNickname">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3 position-relative">
+                <label class="form-label fw-semibold text-secondary">
+                    <i class="bi bi-lock me-2"></i>Password
+                </label>
+                <div class="input-group">
+                    <input type="@passwordInputType" class="form-control" value="@currentUser.Password" readonly />
+                    <button class="btn btn-outline-secondary" type="button" @onclick="TogglePasswordVisibility">
+                        <i class="@passwordIcon"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" @onclick="OpenEditModalPassword">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Balance -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-secondary">
+                    <i class="bi bi-wallet2 me-2"></i>Balance
+                </label>
+                <div class="form-control bg-light">@currentUser.Balance.ToString("C", new System.Globalization.CultureInfo("id-ID"))</div>
+            </div>
+
+            <!-- Total Transactions -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">
+                    <i class="bi bi-bar-chart me-2"></i>Total Transactions
+                </label>
+                <div class="form-control bg-light">@currentUser.TotalTransactions</div>
+            </div>
+
+            <!-- Delete Account Button -->
+            <div class="d-grid">
+                <button class="btn btn-danger rounded-3 fw-semibold" @onclick="DeleteAccount">
+                    <i class="bi bi-trash3 me-2"></i>Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (isEditModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@modalTitle</h5>
+                    <button type="button" class="btn-close" @onclick="HideModal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" @bind="newValue" placeholder="Enter new value" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="HideModal">Cancel</button>
+                    <button class="btn btn-success" @onclick="SaveEdit">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isDeleteConfirmVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="HideModal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this account?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="HideModal">Cancel</button>
+                    <button class="btn btn-danger" @onclick="ConfirmDelete">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private UserModel currentUser = new UserModel();
+
+    private bool showPassword = false;
+    private bool isEditModalVisible = false;
+    private bool isDeleteConfirmVisible = false;
+    private string passwordInputType => showPassword ? "text" : "password";
+    private string passwordIcon => showPassword ? "bi bi-eye-slash" : "bi bi-eye";
+    private string modalTitle = "";
+    private string newValue = "";
+    private string editType = "";
+    private string message = "";
+    private bool isLoading = false;
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+
+    private void OpenEditModalNickname()
+    {
+        modalTitle = "Edit Nickname";
+        newValue = currentUser.Nickname;
+        editType = "nickname";
+        isEditModalVisible = true;
+    }
+
+    private void OpenEditModalPassword()
+    {
+        modalTitle = "Edit Password";
+        newValue = "";
+        editType = "password";
+        isEditModalVisible = true;
+    }
+
+    private async Task SaveEdit()
+    {
+        isLoading = true;
+        message = "";
+        try
+        {
+            // User id from token service
+            var userIdStr = tokenService.UserId;
+            if (!int.TryParse(userIdStr, out var userIdInt))
+            {
+                message = "Invalid user id.";
+                return;
+            }
+
+            // Apply the change locally first
+            if (editType == "nickname")
+                currentUser.Nickname = newValue;
+            else if (editType == "password")
+                currentUser.Password = newValue;
+
+            // Prepare the update payload
+            var updatedUser = new
+            {
+                user_id = userIdInt,
+                nickname = currentUser.Nickname,
+                password = currentUser.Password,
+            };
+
+            var response = await Http.PutAsJsonAsync("user/update", updatedUser);
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Profile updated successfully!";
+                HideModal();
+            }
+            else
+            {
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                message = $"Failed to update user: {errorMsg}";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void HideModal()
+    {
+        isEditModalVisible = false;
+        isDeleteConfirmVisible = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        isLoading = true;
+        message = "";
+
+        try
+        {
+            // User id from token service
+            var userIdStr = tokenService.UserId;
+            if (!int.TryParse(userIdStr, out var userIdInt))
+            {
+                message = "Invalid user id.";
+                return;
+            }
+
+            var response = await Http.DeleteAsync($"user/delete/{userIdInt}");
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Account deleted successfully.";
+                await Auth.LogoutAsync();
+                HideModal();
+                Navigation.NavigateTo("/login", true);
+            }
+            else
+            {
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                message = $"Failed to delete account: {errorMsg}";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void DeleteAccount()
+    {
+        isDeleteConfirmVisible = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await tokenService.InitializeAsync();
+        var userId = tokenService.UserId;
+        try
+        {
+            var response = await Http.GetAsync($"user/{userId}");
+            response.EnsureSuccessStatusCode();
+
+            var jsonUser = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+            currentUser = new UserModel
+            {
+                Email = jsonUser.GetProperty("email").GetString() ?? string.Empty,
+                Nickname = jsonUser.GetProperty("nickname").GetString() ?? string.Empty,
+                Password = jsonUser.GetProperty("password").GetString() ?? string.Empty,
+                Balance = jsonUser.GetProperty("balance").GetDecimal()
+            };
+            // Get Total Transactions
+            var transactionResponse = await Http.GetAsync($"transaction/CountUserTransactions/{jsonUser.GetProperty("user_id").GetInt32()}");
+            if (transactionResponse.IsSuccessStatusCode)
+            {
+                var transactionJson = await transactionResponse.Content.ReadFromJsonAsync<JsonElement>();
+                currentUser.TotalTransactions = transactionJson.GetProperty("total_transactions").GetInt32();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching user data: {ex.Message}");
+        }
+    }
+
+    private class UserModel 
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Nickname { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public decimal Balance { get; set; }
+        public int TotalTransactions { get; set; }
+    }
+}

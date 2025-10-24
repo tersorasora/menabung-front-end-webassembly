@@ -174,6 +174,7 @@ main[b-tkcazam59b] {
     height: 3.5rem;
     display: flex;
     align-items: center;
+    z-index: 99999;
 }
 
     .top-row[b-tkcazam59b]  a, .top-row[b-tkcazam59b]  .btn-link {
@@ -344,4 +345,82 @@ main[b-tkcazam59b] {
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
+}
+/* /Components/Pages/Admin.razor.rz.scp.css */
+/* General layout */
+.p-4[b-6xd59icrun] {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* Card container for both tables */
+.card[b-6xd59icrun] {
+    min-height: 600px; /* keeps height stable across pages */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+}
+
+/* Table area */
+.table-container[b-6xd59icrun] {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 450px;
+}
+
+.static-table[b-6xd59icrun] {
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+/* Table styling */
+.table[b-6xd59icrun] {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead[b-6xd59icrun] {
+    background-color: #28a745 !important;
+    color: white;
+    text-align: center;
+}
+
+.table tbody tr[b-6xd59icrun] {
+    text-align: center;
+}
+
+.table-hover tbody tr:hover[b-6xd59icrun] {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+/* Pagination buttons section */
+.pagination-container[b-6xd59icrun] {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 15px;
+}
+
+.pagination-container button[b-6xd59icrun] {
+    min-width: 90px;
+}
+
+.pagination-container span[b-6xd59icrun] {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Optional: consistent shadow style */
+.card.shadow-sm[b-6xd59icrun] {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Optional: page title */
+.text-center[b-6xd59icrun] {
+    text-align: center;
+    margin-bottom: 1.5rem;
 }

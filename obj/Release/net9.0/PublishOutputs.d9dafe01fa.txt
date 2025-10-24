@@ -1,1 +1,3 @@
+C:\Jobs\BlazorAppWeb\publish\dist\sample-data\weather.json
+C:\Jobs\BlazorAppWeb\publish\dist\_framework\blazor.boot.json
 C:\Jobs\BlazorAppWeb\publish\web.config

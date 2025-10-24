@@ -4,6 +4,7 @@
 @using BlazorAppWeb.Components.Layout
 @inject IJSRuntime JS
 @inject AuthService Auth
+@inject TokenService tokenService
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
@@ -16,11 +17,11 @@
 
         <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" class="form-login">
             <div class="input-group">
-                <input @bind-value="loginModel.Username" type="text" placeholder="Username" class="input-field" />
+                <input @bind-value="loginModel.Email" type="email" placeholder="Email" class="input-field" required/>
             </div>
 
             <div class="input-group">
-                <input @bind-value="loginModel.Password" type="password" placeholder="Password" class="input-field" />
+                <input @bind-value="loginModel.Password" type="password" placeholder="Password" class="input-field" required/>
             </div>
 
             <button type="submit" class="btn-login">Sign In</button>
@@ -41,11 +42,11 @@
 
     private async Task HandleLogin()
     {
-        Console.WriteLine($"Attempting login: {loginModel.Username} / {loginModel.Password}");
+        Console.WriteLine($"Attempting login: {loginModel.Email} / {loginModel.Password}");
 
         var response = await Http.PostAsJsonAsync("user/login", new 
         { 
-            username = loginModel.Username, 
+            email = loginModel.Email, 
             password = loginModel.Password 
         });
 
@@ -55,9 +56,13 @@
             message = "Login Successful!";
 
             if (result is not null && !string.IsNullOrEmpty(result.Token))
-            {
+            {   
                 // save token in browser localStorage
                 await JS.InvokeVoidAsync("localStorage.setItem", "token", result.Token);
+
+                // Initialize TokenService so it's ready right away
+                await tokenService.InitializeAsync();
+                Console.WriteLine($"UserID: {tokenService.UserId}, Nickname: {tokenService.Nickname}");
 
                 message = "Login Successful! Redirecting...";
                 
@@ -81,7 +86,7 @@
 
     private class LoginModel
     {
-        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
 

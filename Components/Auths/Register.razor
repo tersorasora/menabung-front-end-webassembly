@@ -14,15 +14,15 @@
 
         <EditForm Model="@registerModel" OnValidSubmit="HandleRegister" class="form-register">
             <div class="input-group">
-                <input @bind-value="registerModel.Username" type="text" placeholder="Username" class="input-field" />
+                <input @bind-value="registerModel.Email" type="email" placeholder="Email" class="input-field" required/>
             </div>
 
             <div class="input-group">
-                <input @bind-value="registerModel.Nickname" type="text" placeholder="Nickname" class="input-field" />
+                <input @bind-value="registerModel.Nickname" type="text" placeholder="Nickname" class="input-field" required/>
             </div>
 
             <div class="input-group">
-                <input @bind-value="registerModel.Password" type="password" placeholder="Password" class="input-field" />
+                <input @bind-value="registerModel.Password" type="password" placeholder="Password" class="input-field" required/>
             </div>
 
             <button type="submit" class="btn-register">Sign Up</button>
@@ -43,11 +43,11 @@
 
     private async Task HandleRegister()
     {
-        Console.WriteLine($"Attempting registration: {registerModel.Username} / {registerModel.Nickname} / {registerModel.Password}");
+        Console.WriteLine($"Attempting registration: {registerModel.Email} / {registerModel.Nickname} / {registerModel.Password}");
 
-        var response = await Http.PostAsJsonAsync("user/register", new 
-        { 
-            username = registerModel.Username, 
+        var response = await Http.PostAsJsonAsync("user/register", new
+        {
+            email = registerModel.Email,
             nickname = registerModel.Nickname,
             password = registerModel.Password
         });
@@ -55,7 +55,7 @@
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<RegisterResult>();
-            message = $"Registration successful! Message: {result?.Message}";
+            message = $"Registration successful! Message : {result?.Message}";
 
             @* Move to login page *@
             Navigation.NavigateTo("/login");
@@ -69,7 +69,7 @@
 
     private class RegisterModel
     {
-        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }

@@ -1,0 +1,77 @@
+/* General layout */
+.p-4 {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* Card container for both tables */
+.card {
+    min-height: 600px; /* keeps height stable across pages */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+}
+
+/* Table area */
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 450px;
+}
+
+.static-table {
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+/* Table styling */
+.table {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead {
+    background-color: #28a745 !important;
+    color: white;
+    text-align: center;
+}
+
+.table tbody tr {
+    text-align: center;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+/* Pagination buttons section */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 15px;
+}
+
+.pagination-container button {
+    min-width: 90px;
+}
+
+.pagination-container span {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Optional: consistent shadow style */
+.card.shadow-sm {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Optional: page title */
+.text-center {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}

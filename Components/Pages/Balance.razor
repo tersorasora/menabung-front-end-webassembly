@@ -7,6 +7,7 @@
 @using Microsoft.VisualBasic
 @inject IJSRuntime JS
 @inject HttpClient Http
+@inject TokenService tokenService
 
 <PageTitle>Balance</PageTitle>
 
@@ -100,7 +101,6 @@
     private List<Transactions> transactions = new List<Transactions>();
     private List<Transactions> allTransactions = new List<Transactions>();
     private int selectedMonth = 0;
-    private string userID = string.Empty;
     private int monthValueFilter{
         get => selectedMonth;
         set{
@@ -180,20 +180,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await JS.InvokeAsync<string>("localStorage.getItem", "token");
-
-        if(string.IsNullOrEmpty(token)){
+        await tokenService.InitializeAsync();
+        if (string.IsNullOrEmpty(tokenService.Token))
+        {
             Console.WriteLine("No Token Found");
             currentBalance = 0;
             return;
         }
 
-        // Decode payload from JWT to get userID
-        var parts = token.Split('.');
-        var payloadJson = System.Text.Encoding.UTF8.GetString(ParseBase64WithoutPadding(parts[1]));
-        var payload = System.Text.Json.JsonDocument.Parse(payloadJson);
-        userID = payload.RootElement.GetProperty("sub").ToString();
-
+        var userID = tokenService.UserId;
         try{
             await FetchBalance(userID);
             await FetchTransactions(userID);
@@ -249,17 +244,6 @@
         }else{
             transactions = allTransactions.Where(t => t.Date.Month == selectedMonth && t.Date.Year == selectedYear).ToList();
         }
-    }
-
-    private static byte[] ParseBase64WithoutPadding(string base64)
-    {
-        base64 = base64.Replace('-', '+').Replace('_', '/');
-        switch (base64.Length % 4)
-        {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
-        }
-        return Convert.FromBase64String(base64);
     }
 
     private async Task DeleteTransaction(int id)
