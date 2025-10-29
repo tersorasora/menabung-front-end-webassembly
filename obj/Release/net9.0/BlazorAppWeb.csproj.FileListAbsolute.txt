@@ -1095,10 +1095,10 @@ C:\Jobs\BlazorAppWeb\obj\Release\net9.0\scopedcss\Components\Pages\Admin.razor.r
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\2h64bw8u9r-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\q8gledo1fs-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\jt9e8es9id-12n6dz54qr.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.1rb397sn4b.wasm
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.x7xsto43do.pdb
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.1rb397sn4b.wasm.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.x7xsto43do.pdb.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-1rb397sn4b.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-x7xsto43do.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-ukyljnbrv8.gz
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.p2ojqxf6ez.wasm
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.mwk7erdvsi.pdb
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.p2ojqxf6ez.wasm.gz
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.mwk7erdvsi.pdb.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-p2ojqxf6ez.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-mwk7erdvsi.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-lokpl0udhi.gz
