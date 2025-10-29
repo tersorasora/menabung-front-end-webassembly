@@ -54,7 +54,7 @@
                                 {
                                     <tr>
                                         <td>@user.Id</td>
-                                        <td>@user.Email</td>
+                                        <td>@user.Username</td>
                                         <td>@user.Nickname</td>
                                         <td>@user.Password</td>
                                         <td>@user.Balance</td>
@@ -194,7 +194,7 @@
                 var tempUser = new UserModel
                 {
                     Id = jsonUser.GetProperty("user_id").GetInt32(),
-                    Email = jsonUser.GetProperty("email").GetString() ?? string.Empty,
+                    Username = jsonUser.GetProperty("username").GetString() ?? string.Empty,
                     Nickname = jsonUser.GetProperty("nickname").GetString() ?? string.Empty,
                     Password = jsonUser.GetProperty("password").GetString() ?? string.Empty,
                     Balance = jsonUser.GetProperty("balance").GetDecimal(),
@@ -323,7 +323,7 @@
     public class UserModel
     {
         public int Id { get; set; }
-        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public decimal Balance { get; set; }

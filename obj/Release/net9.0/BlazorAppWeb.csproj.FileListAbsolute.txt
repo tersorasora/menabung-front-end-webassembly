@@ -1086,11 +1086,7 @@ C:\Jobs\BlazorAppWeb\obj\Release\net9.0\BlazorAppWeb.pdb
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\ref\BlazorAppWeb.dll
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\BlazorAppWeb.sourcelink.json
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\Blazored.LocalStorage.12n6dz54qr.wasm
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.cezq8fh499.wasm
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.jtjjbim690.pdb
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\Blazored.LocalStorage.12n6dz54qr.wasm.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.cezq8fh499.wasm.gz
-C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.jtjjbim690.pdb.gz
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\dist\sample-data\weather.json
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\dist\_framework\blazor.boot.json
 C:\Jobs\BlazorAppWeb\bin\Release\net9.0\Blazored.LocalStorage.dll
@@ -1099,6 +1095,10 @@ C:\Jobs\BlazorAppWeb\obj\Release\net9.0\scopedcss\Components\Pages\Admin.razor.r
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\2h64bw8u9r-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\q8gledo1fs-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\jt9e8es9id-12n6dz54qr.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-cezq8fh499.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-jtjjbim690.gz
-C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-71qdr5gcnx.gz
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.1rb397sn4b.wasm
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.x7xsto43do.pdb
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.1rb397sn4b.wasm.gz
+C:\Jobs\BlazorAppWeb\bin\Release\net9.0\wwwroot\_framework\BlazorAppWeb.x7xsto43do.pdb.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\p8lrwpa9fe-1rb397sn4b.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\99a27cb0uc-x7xsto43do.gz
+C:\Jobs\BlazorAppWeb\obj\Release\net9.0\compressed\s3o4ybfszt-ukyljnbrv8.gz

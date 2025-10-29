@@ -17,12 +17,12 @@
                 <i class="bi bi-person-circle me-2"></i>Profile
             </h3>
 
-            <!-- Email -->
+            <!-- Username -->
             <div class="mb-3">
                 <label class="form-label fw-semibold text-secondary">
-                    <i class="bi bi-envelope me-2"></i>Email
+                    <i class="bi bi-envelope me-2"></i>Username
                 </label>
-                <div class="form-control bg-light">@currentUser.Email</div>
+                <div class="form-control bg-light">@currentUser.Username</div>
             </div>
 
             <!-- Nickname -->
@@ -270,7 +270,7 @@
 
             currentUser = new UserModel
             {
-                Email = jsonUser.GetProperty("email").GetString() ?? string.Empty,
+                Username = jsonUser.GetProperty("username").GetString() ?? string.Empty,
                 Nickname = jsonUser.GetProperty("nickname").GetString() ?? string.Empty,
                 Password = jsonUser.GetProperty("password").GetString() ?? string.Empty,
                 Balance = jsonUser.GetProperty("balance").GetDecimal()
@@ -291,7 +291,7 @@
 
     private class UserModel 
     {
-        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public decimal Balance { get; set; }

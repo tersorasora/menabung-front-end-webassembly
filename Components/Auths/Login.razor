@@ -17,7 +17,7 @@
 
         <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" class="form-login">
             <div class="input-group">
-                <input @bind-value="loginModel.Email" type="email" placeholder="Email" class="input-field" required/>
+                <input @bind-value="loginModel.Username" type="text" placeholder="Username" class="input-field" required/>
             </div>
 
             <div class="input-group">
@@ -42,12 +42,12 @@
 
     private async Task HandleLogin()
     {
-        Console.WriteLine($"Attempting login: {loginModel.Email} / {loginModel.Password}");
+        Console.WriteLine($"Attempting login: {loginModel.Username} / {loginModel.Password}");
 
-        var response = await Http.PostAsJsonAsync("user/login", new 
-        { 
-            email = loginModel.Email, 
-            password = loginModel.Password 
+        var response = await Http.PostAsJsonAsync("user/login", new
+        {
+            username = loginModel.Username,
+            password = loginModel.Password
         });
 
         if (response.IsSuccessStatusCode)
@@ -86,7 +86,7 @@
 
     private class LoginModel
     {
-        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
 

@@ -14,7 +14,7 @@
 
         <EditForm Model="@registerModel" OnValidSubmit="HandleRegister" class="form-register">
             <div class="input-group">
-                <input @bind-value="registerModel.Email" type="email" placeholder="Email" class="input-field" required/>
+                <input @bind-value="registerModel.Username" type="text" placeholder="Username" class="input-field" required/>
             </div>
 
             <div class="input-group">
@@ -43,11 +43,11 @@
 
     private async Task HandleRegister()
     {
-        Console.WriteLine($"Attempting registration: {registerModel.Email} / {registerModel.Nickname} / {registerModel.Password}");
+        Console.WriteLine($"Attempting registration: {registerModel.Username} / {registerModel.Nickname} / {registerModel.Password}");
 
         var response = await Http.PostAsJsonAsync("user/register", new
         {
-            email = registerModel.Email,
+            username = registerModel.Username,
             nickname = registerModel.Nickname,
             password = registerModel.Password
         });
@@ -69,7 +69,7 @@
 
     private class RegisterModel
     {
-        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }

@@ -1,0 +1,365 @@
+@page "/list"
+@inject NavigationManager NavManager
+@using System.Net.Http
+@using BlazorAppWeb.Components.Models
+@using BlazorAppWeb.Components.Layout
+@using System.Text.Json
+@using Microsoft.VisualBasic
+@using System.Runtime.CompilerServices
+@using System.Threading.Tasks
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject TokenService tokenService
+
+<PageTitle>To Do List</PageTitle>
+
+<div class="container mt-4">
+    <h2>Your To Do List</h2>
+    <p class="subtitle">Manage your tasks effectively</p>
+
+    <!-- Filters -->
+    <div class="filters d-flex mb-4 justify-content-between align-items-center flex-wrap">
+        <div class="d-flex gap-4 align-items-center flex-wrap">
+            <div class="month-group d-flex align-items-center">
+                <span class="fw-bold me-2">Month</span>
+                <select @bind="monthValueFilter" class="form-select">
+                    <option value="0">All</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <div class="year-group d-flex align-items-center">
+                <span class="fw-bold me-2">Year</span>
+                <select @bind="yearValueFilter" class="form-select">
+                    @for (int year = DateTime.Now.Year; year >= (DateTime.Now.Year - 10); year--)
+                    {
+                        <option value="@year">@year</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="add-task-group d-flex align-items-center">
+            <button class="btn btn-primary px-4" @onclick="ShowAddTaskModal">
+                <i class="bi bi-plus-lg me-2"></i> Create Task
+            </button>
+        </div>
+    </div>
+
+    <!-- To Do Cards -->
+    @if (filteredToDoLists == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!filteredToDoLists.Any())
+    {
+        <p>No tasks found.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            @foreach (var todo in filteredToDoLists)
+            {
+                <div class="col">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="flex-grow-1">
+                                    <p class="card-text fw-semibold">@todo.Objective</p>
+                                    <p class="card-text text-secondary mb-1">
+                                        <small>@todo.Date.ToString("dd MMM yyyy")</small>
+                                    </p>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                    <!-- Checkbox -->
+                                    <div class="form-check d-flex align-items-center me-2">
+                                        <input class="form-check-input me-1" type="checkbox"
+                                            checked="@todo.IsFinished"
+                                            @onchange="() => CheckAndUpdate(todo.Id)" />
+                                        <label class="form-check-label small">
+                                            @(todo.IsFinished ? "Done" : "Not Done")
+                                        </label>
+                                    </div>
+
+                                    <!-- Edit button -->
+                                    <button class="btn btn-outline-warning btn-sm d-flex align-items-center"
+                                            title="Edit Task"
+                                            @onclick="() => ShowEditModal(todo.Id)">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+
+                                    <!-- Delete button -->
+                                    <button class="btn btn-outline-danger btn-sm d-flex align-items-center"
+                                            title="Delete Task"
+                                            @onclick="() => DeleteTask(todo.Id)">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Modal -->
+@if (isAddModalOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Task</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAddModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Objective</label>
+                        <input type="text" class="form-control" @bind="newTask.objective" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseAddModal">Cancel</button>
+                    <button class="btn btn-primary" @onclick="AddNewTask">Save Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Edit Modal -->
+@if (isEditModalOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Task</h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Objective</label>
+                        <input type="text" class="form-control" @bind="TaskToEdit!.Objective" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseEditModal">Cancel</button>
+                    <button class="btn btn-primary" @onclick="EditTask">Save Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code 
+{
+    private List<TodoListModel> toDoLists = new();
+    private List<TodoListModel> filteredToDoLists = new();
+    private bool isAddModalOpen = false;
+    private todoListRequestModel newTask = new todoListRequestModel();
+    private bool isEditModalOpen = false;
+    private TodoListModel? TaskToEdit = new TodoListModel();
+
+    // Fiter Components
+    private int selectedMonth = DateTime.Now.Month;
+    private int selectedYear = DateTime.Now.Year;
+    private int monthValueFilter{
+        get => selectedMonth;
+        set{
+            selectedMonth = value;
+            ApplyDateFilter();
+        }
+    }
+
+    private int yearValueFilter{
+        get => selectedYear;
+        set{
+            selectedYear = value;
+            ApplyDateFilter();
+        }
+    }
+
+    private void ApplyDateFilter(){
+        if(selectedMonth == 0 ){
+            filteredToDoLists = toDoLists.Where(t => t.Date.Year == selectedYear).ToList();
+        }else{
+            filteredToDoLists = toDoLists.Where(t => t.Date.Month == selectedMonth && t.Date.Year == selectedYear).ToList();
+        }
+    }
+
+    private void ShowAddTaskModal()
+    {
+        isAddModalOpen = true;
+    }
+
+    private void CloseAddModal()
+    {
+        isAddModalOpen = false;
+    }
+
+    private void ShowEditModal(int id)
+    {
+        TaskToEdit = toDoLists.FirstOrDefault(t => t.Id == id);
+        isEditModalOpen = true;
+    }
+
+    private void CloseEditModal()
+    {
+        isEditModalOpen = false;
+        TaskToEdit = null;
+    }
+
+    private async Task AddNewTask()
+    {
+        try
+        {
+            int userId = int.Parse(tokenService.UserId ?? "0");
+            newTask.user_id = userId;
+            var request = new HttpRequestMessage(HttpMethod.Post, "todolist/create")
+            {
+                Content = JsonContent.Create(newTask)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenService.Token);
+
+            var response = await Http.SendAsync(request);
+            if(response.IsSuccessStatusCode){
+                Console.WriteLine("New To Do List added successfully.");
+                await JS.InvokeVoidAsync("alert", "New Task added successfully.");
+                // reset form
+                newTask = new todoListRequestModel();
+                 // Refresh the list
+                await FetchToDoLists();
+                filteredToDoLists = new List<TodoListModel>(toDoLists);
+            }else{
+                Console.WriteLine($"Failed to add new To Do List. Status code: {response.StatusCode}");
+                await JS.InvokeVoidAsync("alert", $"Failed to add new Task. Status code: {response.StatusCode}");
+            }
+
+            CloseAddModal();
+        }catch(Exception ex){
+            Console.WriteLine($"Error adding new To Do List: {ex.Message}");
+        }
+    }
+
+    private async Task EditTask()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, $"todolist/update/{TaskToEdit!.Id}?objective={Uri.EscapeDataString(TaskToEdit.Objective)}&isCompleted={TaskToEdit.IsFinished.ToString().ToLower()}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenService.Token);
+
+            var response = await Http.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            CloseEditModal();
+        }catch(Exception ex){
+            Console.WriteLine($"Error editing To Do List: {ex.Message}");
+        }
+    }
+
+    private async Task CheckAndUpdate(int id)
+    {
+        try
+        {
+            var todoItem = toDoLists.FirstOrDefault(t => t.Id == id);
+            if (todoItem != null)
+            {
+                todoItem.IsFinished = !todoItem.IsFinished;
+
+                // Update backend
+                var request = new HttpRequestMessage(HttpMethod.Put, $"todolist/update/{id}?objective={Uri.EscapeDataString(todoItem.Objective)}&isCompleted={todoItem.IsFinished.ToString().ToLower()}");
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenService.Token);
+
+                var response = await Http.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+            }
+        }catch(Exception ex){
+            Console.WriteLine($"Error updating To Do List status: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteTask(int id)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"todolist/delete/{id}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenService.Token);
+
+            var response = await Http.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            // Refresh the list
+            await FetchToDoLists();
+            filteredToDoLists = new List<TodoListModel>(toDoLists);
+        }catch(Exception ex){
+            Console.WriteLine($"Error Deleting To Do List : {ex.Message}");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await tokenService.InitializeAsync();
+        if (string.IsNullOrEmpty(tokenService.Token))
+        {
+            Console.WriteLine("No Token Found");
+            return;
+        }
+
+        await FetchToDoLists();
+        filteredToDoLists = new List<TodoListModel>(toDoLists);
+    }
+
+    public async Task FetchToDoLists()
+    {
+        try
+        {
+            int userId = int.Parse(tokenService.UserId ?? "0");
+            var response = await Http.GetAsync($"todolist/GetAllToDoLists/{userId}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+            if(json.TryGetProperty("todolists", out var todolistJson))
+            {
+                toDoLists = todolistJson.EnumerateArray().Select(item => new TodoListModel
+                {
+                    Id = item.GetProperty("todolist_id").GetInt32(),
+                    Objective = item.GetProperty("objective").GetString() ?? string.Empty,
+                    IsFinished = item.GetProperty("todolist_status").GetBoolean(),
+                    Date = item.GetProperty("todolist_date").GetDateTime()
+                }).ToList();
+            }
+        }catch(Exception ex){
+            Console.WriteLine($"Error fetching To Do Lists: {ex.Message}");
+        }
+    }
+
+    private class TodoListModel
+    {
+        public int Id { get; set; }
+        public string Objective { get; set; } = string.Empty;
+        public Boolean IsFinished { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    private class todoListRequestModel
+    {
+        public string objective { get; set; } = string.Empty;
+        public int user_id { get; set; }
+    }
+}
