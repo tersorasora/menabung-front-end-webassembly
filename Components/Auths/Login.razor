@@ -2,6 +2,7 @@
 @layout NoLayout
 @using System.Net.Http
 @using BlazorAppWeb.Components.Layout
+@using BlazorAppWeb.Components.Models
 @inject IJSRuntime JS
 @inject AuthService Auth
 @inject TokenService tokenService
@@ -37,7 +38,7 @@
 </div>
 
 @code {
-    private LoginModel loginModel = new();
+    private LoginModel loginModel = new LoginModel();
     private string message = string.Empty;
 
     private async Task HandleLogin()
@@ -60,7 +61,7 @@
                 // save token in browser localStorage
                 await JS.InvokeVoidAsync("localStorage.setItem", "token", result.Token);
 
-                // Initialize TokenService so it's ready right away
+                // Initialize TokenService so it's ready right away 
                 await tokenService.InitializeAsync();
                 Console.WriteLine($"UserID: {tokenService.UserId}, Nickname: {tokenService.Nickname}");
 
@@ -83,17 +84,4 @@
             message = $"Login failed ({response.StatusCode}): {error}";
         }
     }
-
-    private class LoginModel
-    {
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
-
-    private class LoginResult
-    {
-        public string Token { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-    }
-
 }

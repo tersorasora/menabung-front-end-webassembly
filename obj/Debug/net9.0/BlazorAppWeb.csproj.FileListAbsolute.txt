@@ -1101,10 +1101,10 @@ C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\2h64bw8u9r-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\q8gledo1fs-s0o10bnvkj.gz
 C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\publish\dist\sample-data\weather.json
 C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\publish\dist\_framework\blazor.boot.json
-C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.vz8nj2g9i2.wasm
-C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.yo8879ze6r.pdb
-C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.vz8nj2g9i2.wasm.gz
-C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.yo8879ze6r.pdb.gz
-C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\p8lrwpa9fe-vz8nj2g9i2.gz
-C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\99a27cb0uc-yo8879ze6r.gz
-C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\s3o4ybfszt-4widgjvnec.gz
+C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.14qbd8oiuj.wasm
+C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.49kds6raee.pdb
+C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.14qbd8oiuj.wasm.gz
+C:\Jobs\BlazorAppWeb\bin\Debug\net9.0\wwwroot\_framework\BlazorAppWeb.49kds6raee.pdb.gz
+C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\p8lrwpa9fe-14qbd8oiuj.gz
+C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\99a27cb0uc-49kds6raee.gz
+C:\Jobs\BlazorAppWeb\obj\Debug\net9.0\compressed\s3o4ybfszt-34wb27oncj.gz

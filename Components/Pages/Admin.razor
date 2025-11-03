@@ -1,6 +1,7 @@
 @page "/admin"
 @using System.Text.Json
 @using System.Net.Http.Headers
+@using BlazorAppWeb.Components.Models
 @inject NavigationManager NavManager
 @inject HttpClient Http
 @inject TokenService tokenService
@@ -141,17 +142,17 @@
     }
 
 @code {
-    private List<UserModel> AllUsers = new();
-    private List<TransactionModel> AllTransactions = new();
+    private List<UserViewModel> AllUsers = new();
+    private List<TransactionViewModel> AllTransactions = new();
 
     private int CurrentUserPage = 1;
     private int CurrentTransactionPage = 1;
     private int PageSize = 10;
 
-    private IEnumerable<UserModel> PagedUsers =>
+    private IEnumerable<UserViewModel> PagedUsers =>
         AllUsers.Skip((CurrentUserPage - 1) * PageSize).Take(PageSize);
 
-    private IEnumerable<TransactionModel> PagedTransactions =>
+    private IEnumerable<TransactionViewModel> PagedTransactions =>
         AllTransactions.Skip((CurrentTransactionPage - 1) * PageSize).Take(PageSize);
 
     private int TotalUserPages => (int)Math.Ceiling(AllUsers.Count / (double)PageSize);
@@ -191,7 +192,7 @@
             
             foreach(var jsonUser in json.EnumerateArray())
             {
-                var tempUser = new UserModel
+                var tempUser = new UserViewModel
                 {
                     Id = jsonUser.GetProperty("user_id").GetInt32(),
                     Username = jsonUser.GetProperty("username").GetString() ?? string.Empty,
@@ -235,7 +236,7 @@
 
             foreach (var jsonTransaction in json.EnumerateArray())
             {
-                var tempTransactions = new TransactionModel
+                var tempTransactions = new TransactionViewModel
                 {
                     Id = jsonTransaction.GetProperty("transaction_id").GetInt32(),
                     Description = jsonTransaction.GetProperty("description").GetString() ?? string.Empty,
@@ -318,27 +319,5 @@
     {
         if (page >= 1 && page <= TotalTransactionPages)
             CurrentTransactionPage = page;
-    }
-
-    public class UserModel
-    {
-        public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Nickname { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public decimal Balance { get; set; }
-        public bool Banned { get; set; } = false;
-        public string Role { get; set; } = string.Empty;
-        public int TotalTransactions { get; set; }
-    }
-
-    public class TransactionModel
-    {
-        public int Id { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public decimal Nominal { get; set; }
-        public DateTime Date { get; set; }
-        public string User { get; set; } = string.Empty;
     }
 }

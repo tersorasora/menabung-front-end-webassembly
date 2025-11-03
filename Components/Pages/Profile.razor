@@ -2,6 +2,7 @@
 @using Microsoft.VisualBasic
 @using System.Text.Json
 @using Microsoft.AspNetCore.Components
+@using BlazorAppWeb.Components.Models
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject HttpClient Http
@@ -287,14 +288,5 @@
         {
             Console.WriteLine($"Error fetching user data: {ex.Message}");
         }
-    }
-
-    private class UserModel 
-    {
-        public string Username { get; set; } = string.Empty;
-        public string Nickname { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public decimal Balance { get; set; }
-        public int TotalTransactions { get; set; }
     }
 }

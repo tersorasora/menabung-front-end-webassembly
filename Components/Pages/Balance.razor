@@ -21,7 +21,7 @@
         <div class="month-group">
             <span>Month Filter</span>
             <select @bind="monthValueFilter">
-                <option value="0" selected>All</option>
+                <option value="0">All</option>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
@@ -100,7 +100,7 @@
     private decimal currentBalance = 0;
     private List<Transactions> transactions = new List<Transactions>();
     private List<Transactions> allTransactions = new List<Transactions>();
-    private int selectedMonth = 0;
+    private int selectedMonth = DateTime.Now.Month;
     private int monthValueFilter{
         get => selectedMonth;
         set{
@@ -193,6 +193,7 @@
             await FetchBalance(userID);
             await FetchTransactions(userID);
             ToggleView();
+            ApplyDateFilter();
         }catch(Exception ex){
             Console.WriteLine($"Error during initialization: {ex.Message}");
         }
@@ -260,13 +261,5 @@
         {
             Console.WriteLine($"Failed to delete transaction. Status: {response.StatusCode}");
         }
-    }
-
-    private class Transactions {
-        public int Id { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty; 
-        public decimal Nominal { get; set; } = 0;
-        public DateTime Date { get; set; } = DateTime.Now;
     }
 }
