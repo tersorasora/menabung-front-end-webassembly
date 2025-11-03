@@ -193,8 +193,6 @@
             await FetchBalance(userID);
             await FetchTransactions(userID);
             ToggleView();
-            Console.WriteLine("Selected Month : " + selectedMonth);
-            Console.WriteLine("Month Value Filter : " + monthValueFilter);
             ApplyDateFilter();
         }catch(Exception ex){
             Console.WriteLine($"Error during initialization: {ex.Message}");
