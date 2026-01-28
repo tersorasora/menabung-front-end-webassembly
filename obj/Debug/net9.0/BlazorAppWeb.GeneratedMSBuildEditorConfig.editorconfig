@@ -87,3 +87,7 @@ build_metadata.AdditionalFiles.CssScope = b-8h3z04jx1r
 [C:/Jobs/BlazorAppWeb/Components/Pages/Admin.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-6xd59icrun
+
+[C:/Jobs/BlazorAppWeb/Components/Pages/Invest.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xJbnZlc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-onhmosxq80

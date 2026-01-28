@@ -1,0 +1,354 @@
+@page "/invest"
+@inject NavigationManager NavManager
+@using System.Net.Http
+@using BlazorAppWeb.Components.Models
+@using BlazorAppWeb.Components.Layout
+@using System.Text.Json
+@using Microsoft.VisualBasic
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject TokenService tokenService
+
+<PageTitle>Investment</PageTitle>
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-3 mb-2">
+        <h3 class="card-title mb-2 fw-bolder">My Investments</h3>
+        <h4 class="text-success fw-bold">
+            <span><i class="bi bi-coin text-warning"></i>Gold : </span>
+            <span style="color: gold">@totalGold grams</span>
+            <span>
+                <button class="btn btn-danger btn-sm icon-btn text-light border-0" disabled="@(totalGold == 0)"
+                    @onclick="() => ShowModal(false)">Sell <i class="bi bi-pencil-square"></i>
+                </button>
+            </span>
+        </h4>
+    </div>
+
+    <div class="d-flex gap-2 mb-3 mt-3">
+        <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(true)">
+            Buy
+        </button>
+    </div>
+
+    @if (investments.Count == 0)
+    {
+        <p class="text-muted">No Investments yet.</p>
+    }
+    else
+    {
+        @foreach (var i in investments)
+        {
+            <div class="card mb-3 shadow-sm border-0"
+                style="border-left: 5px solid @(i.is_sell == true ? "#46F527" : "#131EAB");">
+                <div class="card-body border @(i.is_sell == true ? "border-success" : "border-danger") border-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-1">@(i.is_sell == true ? "Sell" : "Buy") @i.invest_type for @i.quantity
+                                @i.quantity_type</h6>
+                            <small class="text-muted">@i.date.ToString("dd-MM-yyyy")</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge @(i.is_sell == true ? "bg-success" : "bg-danger")">@(i.is_sell == true ? "Sell" :
+                                                        "Buy")</span><br />
+                            <span class="fw-bold">
+                                @(i.is_sell == true ? "+" : "-")
+                                @i.price.ToString("C", new System.Globalization.CultureInfo("id-ID"))
+                            </span>
+                            <span>
+                                <button class="btn btn-light btn-sm icon-btn text-danger border-0" title="Delete Investment"
+                                    @onclick="() => DeleteInvestment(i.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@if (showBuyModal)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-card modal-create" @onclick:stopPropagation="true">
+            <h3>Buying Investment</h3>
+            <EditForm Model="newInvestModel" OnValidSubmit="CreateNewInvest">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label>Select Invest Type</label>
+                        <select @bind="newInvestModel.invest_type">
+                            <option value="" disabled>Select Invest Type</option>
+                            <option value="Gold">Gold</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        @if (newInvestModel.invest_type == "Gold")
+                        {
+                            <span> ( gram )</span>
+                        }
+                        else
+                        {
+                            <span> (unit )</span>
+                        }
+                        <input type="number" step="0.000001" @bind="newInvestModel.quantity"
+                            placeholder="Enter your quantity" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" step="0.000001" @bind="newInvestModel.price"
+                            placeholder="Enter Price per 1 quantity type" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" @bind="newInvestModel.date" />
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-add" type="submit">Create</button>
+                        <button class="btn-cancel" @onclick="CloseModal">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@if (showSellModal)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-card modal-create" @onclick:stopPropagation="true">
+            <h3>Selling Investment</h3>
+            <EditForm Model="newInvestModel" OnValidSubmit="CreateNewInvest">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label>Select Invest Type</label>
+                        <select @bind="newInvestModel.invest_type">
+                            <option value="" disabled>Select Invest Type</option>
+                            <option value="Gold">Gold</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity ( per </label>
+                        @if (newInvestModel.invest_type == "Gold")
+                        {
+                            <span>gram )</span>
+                        }
+                        else
+                        {
+                            <span>unit )</span>
+                        }
+                        <input type="number" step="0.000001" @bind="newInvestModel.quantity"
+                            placeholder="Enter your quantity" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" step="0.000001" @bind="newInvestModel.price"
+                            placeholder="Enter Price per 1 quantity type" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" @bind="newInvestModel.date" />
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-add" type="submit">Create</button>
+                        <button class="btn-cancel" @onclick="CloseModal">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private InvestModel newInvestModel = new();
+    private List<Investment> investments = new();
+    private decimal totalGold = 0;
+    private bool isBuying = false;
+    private bool showBuyModal = false;
+    private bool showSellModal = false;
+    private string userID = string.Empty;
+    private string selectedAsset = string.Empty;
+    private string? token = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await tokenService.InitializeAsync();
+        token = tokenService.Token;
+
+        userID = tokenService.UserId ?? string.Empty;
+
+        try
+        {
+            await FetchInvestments(int.Parse(userID));
+            await FetchTotalGold();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during initialization: {ex.Message}");
+        }
+    }
+
+    private void ShowModal(bool buying)
+    {
+        isBuying = buying;
+        if (isBuying)
+        {
+            showBuyModal = true;
+            newInvestModel.is_sell = false;
+        }
+        else
+        {
+            showSellModal = true;
+            newInvestModel.is_sell = true;
+        }
+    }
+    private void CloseModal()
+    {
+        showBuyModal = false;
+        showSellModal = false;
+    }
+
+    private async Task CreateNewInvest()
+    {
+        try
+        {
+            switch (newInvestModel.invest_type)
+            {
+                case "Gold":
+                    newInvestModel.quantity_type = "gram";
+                    break;
+                default:
+                    newInvestModel.quantity_type = "unit";
+                    break;
+            }
+            newInvestModel.user_id = int.Parse(userID);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "invest/add")
+            {
+                Content = JsonContent.Create(newInvestModel)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                investments.Clear(); // Clear existing investments to avoid duplicates
+                Console.WriteLine("Investment submitted successfully.");
+                await JS.InvokeVoidAsync("alert", "Investment submitted successfully.");
+                await FetchInvestments(int.Parse(userID));
+                await FetchTotalGold();
+                // Optionally, reset the form or provide user feedback here
+                newInvestModel = new InvestModel(); // Reset form
+                CloseModal();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to submit investment. Status code: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating investment: {ex.Message}");
+        }
+    }
+
+    private async Task FetchInvestments(int user_id)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"invest/user/{user_id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorJson = await response.Content.ReadFromJsonAsync<JsonElement>();
+                string backendMessage = errorJson.GetProperty("error").GetString() ?? "Unknown error";
+                Console.WriteLine($"Failed to fetch investments. Status code: {response.StatusCode}, Error: {backendMessage}");
+            }
+            else
+            {
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                var investsArray = json.GetProperty("invests").EnumerateArray();
+
+                foreach (var i in investsArray)
+                {
+                    var invest = new Investment
+                    {
+                        Id = i.GetProperty("invest_id").GetInt32(),
+                        invest_type = i.GetProperty("invest_type").GetString() ?? string.Empty,
+                        quantity = i.GetProperty("quantity").GetDecimal(),
+                        quantity_type = i.GetProperty("quantity_type").GetString() ?? string.Empty,
+                        price = i.GetProperty("price").GetDecimal(),
+                        date = i.GetProperty("date").GetDateTime(),
+                        is_sell = i.GetProperty("is_sell").GetBoolean(),
+                        user_id = i.GetProperty("user_id").GetInt32()
+                    };
+                    investments.Add(invest);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching investments: {ex.Message}");
+        }
+    }
+
+    private async Task FetchTotalGold()
+    {
+        try
+        {
+            var response = await Http.GetAsync($"invest/count/{"Gold"}/{int.Parse(userID)}");
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorJson = await response.Content.ReadFromJsonAsync<JsonElement>();
+                string backendMessage = errorJson.GetProperty("error").GetString() ?? "Unknown error";
+                Console.WriteLine($"Failed to fetch gold counts. Status code: {response.StatusCode}, Error: {backendMessage}");
+            }
+            else
+            {
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                totalGold = json.GetProperty("count").GetDecimal();
+                Console.WriteLine($"Total gold fetched: {totalGold} grams");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error calculating total gold: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteInvestment(int id)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"invest/delete/{id}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenService.Token);
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Investment deleted successfully.");
+            investments.Clear(); // Clear existing investments to avoid duplicates
+            await FetchInvestments(int.Parse(userID));
+            await FetchTotalGold();
+            // Optionally refresh list here
+            NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+        }
+        else
+        {
+            Console.WriteLine($"Failed to delete investment. Status: {response.StatusCode}");
+        }
+    }
+}
